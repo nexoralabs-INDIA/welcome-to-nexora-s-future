@@ -101,7 +101,7 @@ form .full{grid-column:1/-1}
 label{font-size:.85rem;color:var(--mu);display:grid;gap:6px}
 input,select,textarea{background:rgba(5,8,15,.8);border:1px solid var(--ln);color:var(--tx);border-radius:9px;padding:12px;font:inherit}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cy);box-shadow:0 0 0 3px rgba(34,230,255,.15)}
-.safe{font-size:.85rem;color:var(--mu)}#ok{color:var(--gr);min-height:1.4em}
+.safe{font-size:.85rem;color:var(--mu)}#ok,#ok2{color:var(--gr);min-height:1.4em}
 .where{display:flex;flex-wrap:wrap;gap:10px}.where span{padding:9px 18px;border:1px solid var(--ln);border-radius:99px;background:var(--gl)}
 /* contact/footer */
 .contact{text-align:center;padding:48px 20px}.contact h2{margin:0 auto 14px;max-width:none}.contact .cta{justify-content:center}
@@ -207,9 +207,17 @@ footer .fl{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0}footer a:hover
 <section id="contact"><div class="w rv"><div class="glass contact">
 <h2>Have an idea?</h2>
 <p class="lead" style="margin:0 auto 24px">Let's turn interesting problems into things we can actually build.</p>
-<div class="cta"><a class="btn p" href="#spform">Contact NEXORA</a><a class="btn" href="#spform">Sponsor NEXORA</a></div>
+<div class="cta"><a class="btn p" href="#ctform">Contact NEXORA</a><a class="btn" href="#spform">Sponsor NEXORA</a></div>
 <small style="color:var(--mu)">Or email us: mithunxnallarupo@gmail.com</small>
-</div></div></section>
+</div>
+<form id="ctform" class="glass" style="margin-top:20px" aria-label="Contact NEXORA"><input type="hidden" name="access_key" value="b7203e86-8da7-424c-a5a8-224ecd12d5a1"><input type="hidden" name="subject" value="New idea / general message from NEXORA website"><input type="hidden" name="from_name" value="NEXORA Labs website (contact)"><input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+<label>Name<input name="name" required autocomplete="name"></label>
+<label>Email<input name="email" type="email" required autocomplete="email"></label>
+<label class="full">Your idea or message<textarea name="message" rows="4" required></textarea></label>
+<p class="safe full">Please do not submit passwords, payment credentials or other sensitive information through this form.</p>
+<div class="full"><button class="btn p" type="submit">Send message</button> <span id="ok2" role="status"></span></div>
+</form>
+</div></section>
 </main>
 
 <footer><div class="w">
@@ -242,7 +250,7 @@ const SponsorCTA=()=>`<a class="btn p" href="#spform">Become a sponsor</a>`;
 const SponsorLogo=s=>`<a class="logo-slot glass" href="${esc(s.website)}" rel="sponsored noopener" target="_blank">${s.logo?`<img src="${esc(s.logo)}" alt="${esc(s.name)}" style="max-width:100%">`:esc(s.name)}<br><small>${esc(s.level)}</small></a>`;
 const SponsorProject=s=>`<div class="glass card"><span class="lbl">SPONSORED</span><h3>${esc(s.project)}</h3><p>${esc(s.description)}</p></div>`;
 const SponsorBanner=b=>b?`<span class="lbl">SPONSORED</span><span>${esc(b.text)}</span><a class="btn" href="${esc(b.url)}" rel="sponsored noopener" target="_blank">${esc(b.sponsor)}</a>`:`<span class="lbl">SPONSORED</span><span style="color:var(--mu)">Clearly labelled sponsor placements will appear here when available. No sponsors yet.</span>${SponsorCTA()}`;
-const SponsorApplication=()=>{const f=$("#spform"),ok=$("#ok"),btn=f.querySelector("button[type=submit]");f.addEventListener("submit",async e=>{e.preventDefault();btn.disabled=true;ok.style.color="";ok.textContent="Sending...";
+const wireForm=(fid,oid)=>{const f=$(fid),ok=$(oid),btn=f.querySelector("button[type=submit]");f.addEventListener("submit",async e=>{e.preventDefault();btn.disabled=true;ok.style.color="";ok.textContent="Sending...";
  try{const r=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(f)))});const j=await r.json();
  if(j.success){ok.textContent="Message sent. Thank you. We will reply by email.";f.reset()}else throw 0}
  catch(x){ok.style.color="#fb7185";ok.textContent="Could not send. Please email us at mithunxnallarupo@gmail.com"}
@@ -251,7 +259,7 @@ $("#tiers").innerHTML=SPONSOR_DATA.tiers.map(SponsorCard).join("");
 $("#uses").innerHTML=SPONSOR_DATA.uses.map(u=>`<div class="card glass"><h3>${esc(u.t)}</h3><p>${esc(u.d)}</p></div>`).join("");
 $("#logos").innerHTML=SPONSOR_DATA.sponsors.length?SPONSOR_DATA.sponsors.map(SponsorLogo).join(""):`<div class="logo-slot">Your organization could be here.</div>`;
 $("#banner").innerHTML=SponsorBanner(SPONSOR_DATA.banner);
-SponsorApplication();
+const SponsorApplication=()=>wireForm("#spform","#ok");SponsorApplication();wireForm("#ctform","#ok2");
 
 /* ===== Products ===== */
 const P=[
