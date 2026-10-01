@@ -179,7 +179,7 @@ footer .fl{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0}footer a:hover
 <p class="note">Sponsorship supports the lab's work. It does not give ownership of NEXORA Labs and does not offer financial returns.</p>
 
 <h3 class="f" style="font-size:1.5rem;margin:56px 0 18px">Interested in sponsoring NEXORA?</h3>
-<form class="glass" id="spform" aria-label="Sponsorship enquiry">
+<form class="glass" id="spform" aria-label="Sponsorship enquiry"><input type="hidden" name="access_key" value="b7203e86-8da7-424c-a5a8-224ecd12d5a1"><input type="hidden" name="subject" value="New NEXORA Labs enquiry"><input type="hidden" name="from_name" value="NEXORA Labs website"><input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
 <label>Name<input name="name" required autocomplete="name"></label>
 <label>Organization<input name="org" autocomplete="organization"></label>
 <label>Email<input name="email" type="email" required autocomplete="email"></label>
@@ -207,8 +207,8 @@ footer .fl{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0}footer a:hover
 <section id="contact"><div class="w rv"><div class="glass contact">
 <h2>Have an idea?</h2>
 <p class="lead" style="margin:0 auto 24px">Let's turn interesting problems into things we can actually build.</p>
-<div class="cta"><a class="btn p" href="mailto:mithunxnallarupo@gmail.com">Contact NEXORA</a><a class="btn" href="#spform">Sponsor NEXORA</a></div>
-<small style="color:var(--mu)">mithunxnallarupo@gmail.com</small>
+<div class="cta"><a class="btn p" href="#spform">Contact NEXORA</a><a class="btn" href="#spform">Sponsor NEXORA</a></div>
+<small style="color:var(--mu)">Or email us: mithunxnallarupo@gmail.com</small>
 </div></div></section>
 </main>
 
@@ -242,10 +242,11 @@ const SponsorCTA=()=>`<a class="btn p" href="#spform">Become a sponsor</a>`;
 const SponsorLogo=s=>`<a class="logo-slot glass" href="${esc(s.website)}" rel="sponsored noopener" target="_blank">${s.logo?`<img src="${esc(s.logo)}" alt="${esc(s.name)}" style="max-width:100%">`:esc(s.name)}<br><small>${esc(s.level)}</small></a>`;
 const SponsorProject=s=>`<div class="glass card"><span class="lbl">SPONSORED</span><h3>${esc(s.project)}</h3><p>${esc(s.description)}</p></div>`;
 const SponsorBanner=b=>b?`<span class="lbl">SPONSORED</span><span>${esc(b.text)}</span><a class="btn" href="${esc(b.url)}" rel="sponsored noopener" target="_blank">${esc(b.sponsor)}</a>`:`<span class="lbl">SPONSORED</span><span style="color:var(--mu)">Clearly labelled sponsor placements will appear here when available. No sponsors yet.</span>${SponsorCTA()}`;
-const SponsorApplication=()=>{const f=$("#spform");f.addEventListener("submit",e=>{e.preventDefault();const d=new FormData(f);const body=[...d].map(([k,v])=>k+": "+v).join("\n");
- /* Placeholder: replace with a real form service or API endpoint later. Opens the visitor's email app. */
- location.href="mailto:hello@nexoralabs.example?subject="+encodeURIComponent("NEXORA sponsorship enquiry")+"&body="+encodeURIComponent(body);
- $("#ok").textContent="Thanks. Your email app should open with your message."})};
+const SponsorApplication=()=>{const f=$("#spform"),ok=$("#ok"),btn=f.querySelector("button[type=submit]");f.addEventListener("submit",async e=>{e.preventDefault();btn.disabled=true;ok.style.color="";ok.textContent="Sending...";
+ try{const r=await fetch("https://api.web3forms.com/submit",{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(f)))});const j=await r.json();
+ if(j.success){ok.textContent="Message sent. Thank you. We will reply by email.";f.reset()}else throw 0}
+ catch(x){ok.style.color="#fb7185";ok.textContent="Could not send. Please email us at mithunxnallarupo@gmail.com"}
+ btn.disabled=false})};
 $("#tiers").innerHTML=SPONSOR_DATA.tiers.map(SponsorCard).join("");
 $("#uses").innerHTML=SPONSOR_DATA.uses.map(u=>`<div class="card glass"><h3>${esc(u.t)}</h3><p>${esc(u.d)}</p></div>`).join("");
 $("#logos").innerHTML=SPONSOR_DATA.sponsors.length?SPONSOR_DATA.sponsors.map(SponsorLogo).join(""):`<div class="logo-slot">Your organization could be here.</div>`;
